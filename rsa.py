@@ -243,6 +243,50 @@ def compute_checksum(string):
 # Do not modify code above this line
 # ---------------------------------------
 
+def is_prime(n):
+    """
+    Tests whether a number is prime
+    :author: Lucas
+    :param n: the number to test
+    :return: whether it's prime or not
+    """
+    dividesAnything = False
+    for i in range(2, int(n**0.5)+1):
+        dividesAnything |= n%i==0
+
+    return not dividesAnything
+
+def find_pq(p):
+    """
+    calculates p or q
+    :author: Lucas
+    :param p: 0 if calculating p or what was previously calculated for p if calculating q -- p=find_pq(0), q=find_pq(p)
+    :return: the value of p or q
+    """
+
+    qorp = 0b11000001 | random.randint(0, 1<<5)<<1 #generate number of the form 11_____1
+    while not(
+            is_prime(qorp) and
+            qorp != p and
+            (qorp-1)%PUBLIC_EXPONENT != 0 and
+            ((qorp-1)%p != 0 if p != 0 else True)
+    ):
+        qorp += 2
+
+    return qorp
+
+def create_nz():
+    """
+    Calculates n and z from p and q
+    :author: Lucas
+    :rtype: tuple
+    :return: n, z
+    """
+    p = find_pq(0)
+    q = find_pq(p)
+
+    return p*q, (p-1)*(q-1)
+
 def create_keys():
     """
     Create the public and private keys.
@@ -250,7 +294,13 @@ def create_keys():
     :return: the keys as a three-tuple: (e,d,n)
     """
 
-    pass  # Delete this line and complete this method
+    n, z = create_nz()
+    d = 1 #should be such that  (PUBLIC_EXPONENT*d) mod z = 1
+
+    while (PUBLIC_EXPONENT * d)%z != 1:
+        d+=1
+
+    return (PUBLIC_EXPONENT, d, n)
 
 
 def apply_key(key, m):
