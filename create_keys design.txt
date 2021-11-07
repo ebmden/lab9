@@ -1,4 +1,4 @@
 create_keys()
     |--> create_nz()
-        |--> find_pq
-            |--> is_prime
+        |--> find_pq()
+            |--> is_prime()
