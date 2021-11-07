@@ -8,16 +8,22 @@
 
 16-bit RSA
 
-Introduction: (Describe the lab in your own words)
-
-
-
+Introduction: (Describe the lab in your own words) LG
+The point of this lab is to gain experience in RSA encryption/decryption. We will implement the
+parts of a program that can generate keys, encrypt/decrypt messages with keys, and break keys.
+The keys we use will be 16-bit since they're easier to generate and break than longer keys.
+Before the lab, we will complete an RSA exercise to get experience with creating keys, and using
+keys with messages to encrypt/decrypt them (by hand).
 
 
 
 Question 1: RSA Security
 In this lab, Trudy is able to find the private key from the public key. Why is this not a problem for RSA in practice?
 
+This isn't a problem, because RSA keys are much bigger than 16 bits in practice (usually over 1024 bits). This
+means that there is an upper bound of over 2^1024 possibilities to test when factoring the modulus (n).
+That many possibilities makes the task of factoring n "computationally infeasible," such that the time
+it would take to crack such a key isn't worth it for anyone.
 
 
 
@@ -320,9 +326,9 @@ def apply_key(key, m):
     # k+(e,n) -> (m^e)%n=c
     # k-(d,n) -> (c^d)%n=m -or- (m^e)^d%n=m
     if is_public(key)[0]:  # if key is public -> return c
-        return math.pow(m, PUBLIC_EXPONENT) % is_public(key)[1][1]
+        return int((m ** PUBLIC_EXPONENT) % is_public(key)[1][1])
     else:
-        return math.pow(m, is_public(key)[1][0]) % is_public(key)[1][1]
+        return int((m ** is_public(key)[1][0]) % is_public(key)[1][1])
 
 
 def is_public(key):
@@ -334,7 +340,7 @@ def is_public(key):
     :rtype: list
     :author: Eden Basso
     """
-    if key.count(17) == 0:  # if key !contain e ->
+    if key.count(PUBLIC_EXPONENT) == 0:  # if key !contain e ->
         return False, [key[0], key[1]]
     else:
         return True, [key[0], key[1]]
@@ -351,7 +357,21 @@ def break_key(pub):
     :param pub: a tuple containing the public key (e,n)
     :return: a tuple containing the private key (d,n)
     """
-    pass  # Delete this line and complete this method
+
+    n = pub[1]
+    q = 2
+    while n%q != 0:
+        q+=1
+    p = n/q
+    z = (p-1)*(q-1)
+
+    d = 1  # should be such that  (PUBLIC_EXPONENT*d) mod z = 1
+
+    while (PUBLIC_EXPONENT * d) % z != 1:
+        d += 1
+
+    return d,n
+
 
 
 # Your code and additional functions go here. (Replace this line.)
