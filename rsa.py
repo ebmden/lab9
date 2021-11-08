@@ -31,7 +31,12 @@ it would take to crack such a key isn't worth it for anyone.
 Question 2: Critical Step(s)
 When creating a key, Bob follows certain steps. Trudy follows other steps to break a key. What is the difference between Bob’s steps and Trudy’s so that Bob is able to run his steps on large numbers, but Trudy cannot run her steps on large numbers?
 
-
+Trudy is only provided with K+(e,n) this means to find K-(d,n) *d* Trudy will need to compute (d*e)%z = 1 -or-
+e%z * d%z = 1 -or- e%(q-1)(p-1) * d%(q-1)(p-1) = 1. Due to the fact that there is arithmetic way to directly solve for
+d in this equation due to modulus arithmetic, the only way to solve or do is to iterate through values of d and check to
+see if they will satisfy the previously listed equations. The reason it is computationally infeasible for Trudy to find
+d when n is a "large number" is because factoring n and therefore finding p and q to iterate through to find d has a
+number of possibilities that would take an infeasible amount of time to iterate through.
 
 
 Checksum Activity:
@@ -43,10 +48,13 @@ Provide a dicussion of your experiences as described in the activity.  Be sure t
 
 Summary: (Summarize your experience with the lab, what you learned, what you liked,what you disliked, and any suggestions you have for improvement)
 
-
-
-
-
+The lab taught me the importance and complexity of encryption and overall the security of the data I am sending and
+receiving. Specifically, I learned the basic process of using and applying Euclid's extended Algorithm to RSA
+encryption or in other words modular arithmetic computed values to compute a private key from a public exponent and
+product of primes. I also learned the process and rules in which a key is created: to find prime numbers
+(p and q) it is important they are != and relatively prime to e. I liked the exercise in the beginning that walked my
+partner and I individually through the process of finding then checking these conditions of p and q and then applying
+this to the method design. I have no specific suggestions for improvement.
 """
 import math
 import random
@@ -317,7 +325,7 @@ def create_keys():
     n, z = create_nz(True, 0)
     d = 1  # should be such that  (PUBLIC_EXPONENT*d) mod z = 1
 
-    while (PUBLIC_EXPONENT * d)%z != 1:
+    while (PUBLIC_EXPONENT * d) % z != 1:
         d += 1
 
     return (PUBLIC_EXPONENT, d, n)
