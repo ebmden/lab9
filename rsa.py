@@ -40,9 +40,35 @@ number of possibilities that would take an infeasible amount of time to iterate 
 
 
 Checksum Activity:
-Provide a dicussion of your experiences as described in the activity.  Be sure to answer all questions.
+Provide a discussion of your experiences as described in the activity.  Be sure to answer all questions.
 
+Bob: Run the program with the compute_checksum option to create an encrypted checksum for the message
+"Bob owes Trudy $100.99". Save the public & private keys, as well as the encrypted checksum for your records.
+Provide Alice and Trudy with the public key. Provide Trudy with the plain-text message and the encrypted checksum.
+(Suppose that Trudy is an unscrupulous online store)
+-----> Kb+(17, 58483) Kb-(44353, 58483)
 
+Trudy: Create a message that results in the same checksum as Bob’s message, but implies that Bob owes a larger amount of
+money. Hint: If you rearrange the characters in the string, how does that change the checksum? Supply Alice with the
+forged message and the encrypted checksum that Bob gave you.
+----->"Bob owes Trudy $900.19"
+changing the plain-text to this does not change the checksum due to the way the the characters are added like individual
+bytes, encoded in ASCII then added by rows of 4. The columns sums have the same value even when the plain text was
+changed to this.
+
+Alice: Check Trudy’s message using the verify_checksum option of the program. Does it check out OK? If not,
+Trudy should keep trying.
+-----> enc checksum (hash): ceae   (069e)
+
+As a team: Explain in your final comments how Trudy can be prevented from performing this trick in a real application.
+(Suppose Alice is the bank responsible for transferring the money from Bob to Trudy.
+And note that Trudy did not use break_key here!)
+
+Alice uses a MAC concatenated with m. message authentication code is the hash of a message+s(secret/string of bits)
+Assuming the s is shared between alice and bob already, Bob can then compare m with H(m+s) and be assured that the
+integrity of the message has not been altered if Bob concatenates m + s, calcs the hash, and finally compares his
+computed h w/ Alice's h. This way if the message from before had been interrupted and altered by Trudy,
+the hash would not be the same due to Trudy not having s.
 
 
 
