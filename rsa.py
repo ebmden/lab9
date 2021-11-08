@@ -252,59 +252,73 @@ def compute_checksum(string):
 def is_prime(n):
     """
     Tests whether a number is prime
-    :author: Lucas
     :param n: the number to test
     :return: whether it's prime or not
+    :rtype: bool
+    :author: Lucas Gral
     """
-    dividesAnything = False
+    divides_anything = False
     for i in range(2, int(n**0.5)+1):
-        dividesAnything |= n%i==0
+        divides_anything |= n % i == 0
 
-    return not dividesAnything
+    return not divides_anything
+
 
 def find_pq(p):
     """
     calculates p or q
-    :author: Lucas
     :param p: 0 if calculating p or what was previously calculated for p if calculating q -- p=find_pq(0), q=find_pq(p)
     :return: the value of p or q
+    :rtype: int
+    :author: Lucas Gral
     """
 
-    qorp = 0b11000001 | random.randint(0, 1<<5)<<1 #generate number of the form 11_____1
+    q_or_p = 0b11000001 | random.randint(0, 1 << 5) << 1  # generate number of the form 11_____1
     while not(
-            is_prime(qorp) and
-            qorp != p and
-            (qorp-1)%PUBLIC_EXPONENT != 0 and
-            ((qorp-1)%p != 0 if p != 0 else True)
+            is_prime(q_or_p) and
+            q_or_p != p and
+            (q_or_p-1) % PUBLIC_EXPONENT != 0 and
+            ((q_or_p-1) % p != 0 if p != 0 else True)
     ):
-        qorp += 2
+        q_or_p += 2
 
-    return qorp
+    return q_or_p
 
-def create_nz():
+
+def create_nz(is_creating_key, n):
     """
     Calculates n and z from p and q
-    :author: Lucas
-    :rtype: tuple
+    :param bool is_creating_key: false if the func should run to calc z for break key True if calc z for create key
+    :param int n: the number to be factorized to calculate z
     :return: n, z
+    :rtype: tuple
+    :author: Lucas Gral
     """
-    p = find_pq(0)
-    q = find_pq(p)
+    if not is_creating_key:
+        q = 2
+        while n % q != 0:
+            q += 1
+        p = n / q
+    else:
+        p = find_pq(0)
+        q = find_pq(p)
 
     return p*q, (p-1)*(q-1)
+
 
 def create_keys():
     """
     Create the public and private keys.
-
     :return: the keys as a three-tuple: (e,d,n)
+    :rtype: tuple
+    :author: Lucas Gral
     """
 
-    n, z = create_nz()
-    d = 1 #should be such that  (PUBLIC_EXPONENT*d) mod z = 1
+    n, z = create_nz(True, 0)
+    d = 1  # should be such that  (PUBLIC_EXPONENT*d) mod z = 1
 
     while (PUBLIC_EXPONENT * d)%z != 1:
-        d+=1
+        d += 1
 
     return (PUBLIC_EXPONENT, d, n)
 
@@ -359,19 +373,13 @@ def break_key(pub):
     """
 
     n = pub[1]
-    q = 2
-    while n%q != 0:
-        q+=1
-    p = n/q
-    z = (p-1)*(q-1)
+    z = create_nz(False, n)[1]
 
     d = 1  # should be such that  (PUBLIC_EXPONENT*d) mod z = 1
-
     while (PUBLIC_EXPONENT * d) % z != 1:
         d += 1
 
     return d,n
-
 
 
 # Your code and additional functions go here. (Replace this line.)
